@@ -47,7 +47,7 @@ class NoteOut(NoteIn):
 
 @app.get("/")
 def root():
-    return {"message": "Notes app is running"}
+    return {"status": "ok"}
 
 
 @app.get("/notes")
@@ -98,3 +98,9 @@ def delete_note(note_id: int):
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Note not found")
     return {"message": "Deleted"}
+
+import os
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
