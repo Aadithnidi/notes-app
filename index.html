@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes App</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 600px;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: 8px 12px;
+        margin-right: 5px;
+        cursor: pointer;
+    }
+
+    .note {
+        background: #fafafa;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 8px;
+    }
+
+    .actions {
+        margin-top: 8px;
+    }
+
+    li {
+        list-style: none;
+        background: #fafafa;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+    button {
+    margin-left: 5px;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+    <h1>Notes App</h1>
+
+    <input id="title" placeholder="Title">
+    <textarea id="content" placeholder="Content"></textarea>
+    <button onclick="addNote()">Add Note</button>
+
+    <h2>All Notes</h2>
+    <div id="notesList"></div>
+</div>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+
+        async function fetchNotes() {
+            const res = await fetch(`${API}/notes`);
+            const data = await res.json();
+
+            const list = document.getElementById("notesList");
+            list.innerHTML = "";
+
+            data.forEach(note => {
+            const li = document.createElement("li");
+            
+            // VIEW MODE
+            const viewDiv = document.createElement("div");
+            viewDiv.id = `view-${note.id}`;
+            const text = document.createElement("span");
+            text.innerHTML = `<b>${note.title}</b>: ${note.content}`;
+
+            // EDIT BUTTON
+            const editBtn = document.createElement("button");
+            editBtn.innerText = "Edit";
+            editBtn.onclick = () => startEdit(note.id);
+            
+            // DELETE BUTTON
+            const deleteBtn = document.createElement("button");
+            deleteBtn.innerText = "Delete";
+            deleteBtn.onclick = () => deleteNote(note.id);
+            
+            viewDiv.appendChild(text);
+            viewDiv.appendChild(editBtn);
+            viewDiv.appendChild(deleteBtn);
+            
+            // EDIT MODE
+            const editDiv = document.createElement("div");
+            editDiv.id = `edit-${note.id}`;
+            editDiv.style.display = "none";
+            
+            const titleInput = document.createElement("input");
+            titleInput.value = note.title;
+            titleInput.id = `edit-title-${note.id}`;
+            
+            const contentInput = document.createElement("textarea");
+            contentInput.value = note.content;
+            contentInput.id = `edit-content-${note.id}`;
+            
+            const saveBtn = document.createElement("button");
+            saveBtn.innerText = "Save";
+            saveBtn.onclick = () => saveEdit(note.id);
+            
+            const cancelBtn = document.createElement("button");
+            cancelBtn.innerText = "Cancel";
+            cancelBtn.onclick = () => cancelEdit(note.id);
+            
+            editDiv.appendChild(titleInput);
+            editDiv.appendChild(contentInput);
+            editDiv.appendChild(saveBtn);
+            editDiv.appendChild(cancelBtn);
+            
+            // ADD TO LI\
+            li.appendChild(viewDiv);
+            li.appendChild(editDiv);
+            list.appendChild(li);
+        })
+    }
+        async function deleteNote(id) {
+            await fetch(`${API}/notes/${id}`, {
+                method: "DELETE"});
+            fetchNotes();
+       }
+
+        async function addNote() {
+            const titleInput = document.getElementById("title");
+            const contentInput = document.getElementById("content");
+            
+            const title = titleInput.value;
+            const content = contentInput.value;
+            
+            await fetch(`${API}/notes`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, content })
+            });
+            
+            titleInput.value = "";
+            contentInput.value = "";
+
+    fetchNotes();
+}
+        
+        async function editNote(note) {
+            const newTitle = prompt("Edit title:", note.title);
+            const newContent = prompt("Edit content:", note.content);
+            
+            if (!newTitle || !newContent) return;
+            
+            await fetch(`${API}/notes/${note.id}`, {
+                method: "PUT", headers: {
+            "Content-Type": "application/json"},
+            body: JSON.stringify({
+                title: newTitle,
+                content: newContent
+            })
+        });
+        fetchNotes();
+    }
+
+    function startEdit(id) {
+        document.getElementById(`view-${id}`).style.display = "none";
+        document.getElementById(`edit-${id}`).style.display = "block";
+}   
+    function cancelEdit(id) {
+        document.getElementById(`view-${id}`).style.display = "block";
+        document.getElementById(`edit-${id}`).style.display = "none";
+}
+
+    async function saveEdit(id) {
+        const title = document.getElementById(`edit-title-${id}`).value;
+        const content = document.getElementById(`edit-content-${id}`).value;
+
+    await fetch(`${API}/notes/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ title, content })
+    });
+
+    fetchNotes();
+}
+    
+
+        fetchNotes();
+    </script>
+</body>
+</html>
