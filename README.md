@@ -4,14 +4,14 @@ A full-stack Notes Application built using FastAPI for the backend and HTML/Java
 
 ---
 
-## 🚀 Live Demo
+##  Live Demo
 
 * Frontend: https://notes-app-psi-three.vercel.app
 * Backend API: https://notes-app-u95u.onrender.com/docs
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 **Frontend**
 
@@ -33,7 +33,7 @@ A full-stack Notes Application built using FastAPI for the backend and HTML/Java
 
 ---
 
-## ✨ Features
+##  Features
 
 * Create new notes
 * View all notes
@@ -62,7 +62,7 @@ notes-app/
 
 ---
 
-## ⚙️ How to Run Locally
+##  How to Run Locally
 
 ### 1. Clone the repository
 
@@ -104,7 +104,7 @@ Open `frontend/index.html` in your browser.
 
 ---
 
-## 🧠 What I Learned
+##  What I Learned
 
 * Building REST APIs using FastAPI
 * Handling CRUD operations and database interactions
