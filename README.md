@@ -134,5 +134,3 @@ Open `frontend/index.html` in your browser.
 ## Author
 
 Built by Aadith
-
-```
